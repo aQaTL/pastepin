@@ -23,10 +23,10 @@ pub fn get_paste(db: Db, paste_id: String) -> Json<Option<Paste>> {
 }
 
 #[get("/a?<count>")]
-pub fn all_pastes_brief(db: Db, count: u8) -> Json<Vec<Paste>> {
+pub fn all_pastes_brief(db: Db, count: Option<u8>) -> Json<Vec<Paste>> {
 	Json(pastes
 		.select((id, filename, creation_date))
-		.limit(count as i64)
+		.limit(count.unwrap_or(50) as i64)
 		.load::<Paste>(&*db)
 		.expect("Error loading pastes"))
 }
