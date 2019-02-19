@@ -1,0 +1,22 @@
+[package]
+name = "pastepin"
+version = "0.1.0"
+authors = ["aQaTL <mmsoltys@outlook.com>"]
+edition = "2018"
+license = "MIT"
+
+[dependencies]
+clap = "2"
+rocket = "0.4.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+lazy_static = "1"
+maplit = "1"
+diesel = { version = "1.4.1", features = ["postgres", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+[dependencies.rocket_contrib]
+version = "0.4.0"
+default-features = false
+features = ["diesel_postgres_pool", "json"]
+
