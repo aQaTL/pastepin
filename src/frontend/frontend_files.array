@@ -1,0 +1,1 @@
+[("index.html", include_str!("C:/dev/rust/pastepin/frontend/index.html")), ("mini-dark.min.css", include_str!("C:/dev/rust/pastepin/frontend/mini-dark.min.css")), ("upload.js", include_str!("C:/dev/rust/pastepin/frontend/upload.js")), ]

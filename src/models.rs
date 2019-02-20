@@ -66,7 +66,7 @@ impl<'a> Insertable<pastes::table> for &'a Paste {
 
 impl<'a> UndecoratedInsertRecord<pastes::table> for Paste {}
 
-#[derive(FromForm, Debug)]
+#[derive(FromForm, Serialize, Deserialize, Debug)]
 pub struct PasteForm {
 	pub filename: Option<String>,
 	pub content: Option<String>,
