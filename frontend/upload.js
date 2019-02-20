@@ -19,5 +19,5 @@ function pasteSent() {
     }
     let id = JSON.parse(this.responseText).id;
     document.getElementById("result").innerHTML =
-        `Paste id: <a href="/p/${id}">${id}</a>`;
+        `Paste id: <a href="/${id}">${id}</a>`;
 }

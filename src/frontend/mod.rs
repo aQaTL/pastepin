@@ -1,11 +1,17 @@
 use rocket::{
 	Route,
-	get
+	get,
+	http,
+	response::content::Html,
+	response::content,
 };
+use diesel::prelude::*;
 use std::collections::HashMap;
-use rocket::response::content;
 use std::path::PathBuf;
-use rocket::http;
+use v_htmlescape::escape;
+
+use crate::Db;
+use crate::models::Paste;
 
 pub type FrontendFiles = HashMap<&'static str, &'static str>;
 
@@ -14,7 +20,7 @@ lazy_static::lazy_static! {
 }
 
 pub fn routes() -> Vec<Route> {
-	rocket::routes![index, serve_frontend]
+	rocket::routes![index, serve_frontend, get_paste]
 }
 
 #[get("/")]
@@ -22,7 +28,7 @@ fn index() -> content::Html<&'static str> {
 	content::Html(FRONTEND_FILES.get("index.html").unwrap())
 }
 
-#[get("/<resource..>", rank=2)]
+#[get("/<resource..>", rank = 2)]
 fn serve_frontend(resource: PathBuf) -> Option<content::Content<&'static str>> {
 	let file = FRONTEND_FILES.get(resource.to_str().unwrap())?;
 	if let Some(ext) = resource.extension() {
@@ -33,3 +39,33 @@ fn serve_frontend(resource: PathBuf) -> Option<content::Content<&'static str>> {
 	Some(content::Content(http::ContentType::Plain, file))
 }
 
+#[get("/<paste_id>", rank = 1)]
+pub fn get_paste(db: Db, paste_id: i64) -> Html<String> {
+	use crate::schema::pastes::dsl::*;
+
+	let paste: Paste = pastes
+		.find(paste_id)
+		.first::<Paste>(&*db)
+		.unwrap();
+
+	let filename_s = paste.filename.unwrap_or(String::from("pastepin"));
+	let content_s = paste.content.unwrap_or(String::new());
+
+	let page = format!(
+		r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{}</title>
+	<link rel="stylesheet" href="/mini-dark.min.css">
+</head>
+<body>
+	<pre>{}</pre>
+</body>
+</html>"#,
+		escape(&filename_s),
+		escape(&content_s),
+	);
+
+	Html(page)
+}

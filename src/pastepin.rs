@@ -3,8 +3,7 @@ use rocket::{
 	get, post,
 	request::Form,
 	response::status,
-	http::Status,
-	response::content::Html,
+	http::{Status},
 };
 use rocket_contrib::{json::{Json, JsonValue}, json};
 use crate::Db;
@@ -16,37 +15,11 @@ use crate::schema::pastes::dsl::pastes;
 use chrono::NaiveDateTime;
 
 pub fn routes() -> Vec<Route> {
-	rocket::routes![get_paste, get_paste_json, upload, upload_json, all_pastes_brief]
+	rocket::routes![get_paste, upload, upload_json, all_pastes_brief]
 }
 
 #[get("/p/<paste_id>")]
-pub fn get_paste(db: Db, paste_id: i64) -> Html<String> {
-	use crate::schema::pastes::dsl::*;
-
-	let paste = pastes
-		.find(paste_id)
-		.first::<Paste>(&*db)
-		.unwrap();
-
-	let page = format!(
-		r#"<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>{}</title>
-</head>
-<body>
-	<pre>{}</pre>
-</body>
-</html>"#,
-		paste.filename.unwrap_or(String::from("pastepin")),
-		paste.content.unwrap_or(String::from("")));
-
-	Html(page)
-}
-
-#[get("/p/<paste_id>?type=json")]
-pub fn get_paste_json(db: Db, paste_id: i64) -> Json<Paste> {
+pub fn get_paste(db: Db, paste_id: i64) -> Json<Paste> {
 	Json(pastes
 		.find(paste_id)
 		.first::<Paste>(&*db)
