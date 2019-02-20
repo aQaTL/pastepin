@@ -1,6 +1,6 @@
 CREATE TABLE pastes
 (
-  id            varchar(20)                 NOT NULL,
+  id            BIGSERIAL                   NOT NULL,
   filename      VARCHAR(100),
   content       text,
   creation_date timestamp without time zone NOT NULL,
