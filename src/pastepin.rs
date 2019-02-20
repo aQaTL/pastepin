@@ -1,10 +1,11 @@
 use rocket::{
 	Route,
 	get, post,
-	http::Status,
 	request::Form,
+	response::status,
+	http::Status,
 };
-use rocket_contrib::json::Json;
+use rocket_contrib::{json::{Json, JsonValue}, json};
 use crate::Db;
 use diesel::prelude::*;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -37,7 +38,7 @@ pub fn all_pastes_brief(db: Db, count: Option<u8>) -> Json<Vec<Paste>> {
 
 
 #[post("/u", data = "<form>")]
-pub fn upload(db: Db, form: Form<PasteForm>) -> Status {
+pub fn upload(db: Db, form: Form<PasteForm>) -> status::Custom<Option<JsonValue>> {
 	let paste = Paste {
 		id: 0, //gets ignored when inserting (custom Insertable impl)
 		filename: form.filename.clone(),
@@ -45,11 +46,11 @@ pub fn upload(db: Db, form: Form<PasteForm>) -> Status {
 		creation_date: now(),
 	};
 
-	match diesel::insert_into(pastes).values(paste).execute(&*db) {
-		Ok(_) => Status::Created,
+	match diesel::insert_into(pastes).values(paste).get_result::<Paste>(&*db) {
+		Ok(paste) => status::Custom(Status::Created, Some(json!({"id": paste.id})))
 		Err(err) => {
 			eprintln!("Error: {:?}", err);
-			Status::InternalServerError
+			status::Custom(Status::InternalServerError, None)
 		}
 	}
 }
