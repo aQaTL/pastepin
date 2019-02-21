@@ -40,32 +40,18 @@ fn serve_frontend(resource: PathBuf) -> Option<content::Content<&'static str>> {
 }
 
 #[get("/<paste_id>", rank = 1)]
-pub fn get_paste(db: Db, paste_id: i64) -> Html<String> {
+pub fn get_paste(db: Db, paste_id: i64) -> Option<Html<String>> {
 	use crate::schema::pastes::dsl::*;
 
 	let paste: Paste = pastes
 		.find(paste_id)
 		.first::<Paste>(&*db)
-		.unwrap();
+		.ok()?;
 
 	let filename_s = paste.filename.unwrap_or_else(|| String::from("pastepin"));
 	let content_s = paste.content.unwrap_or_default();
 
-	let page = format!(
-		r#"<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>{}</title>
-	<link rel="stylesheet" href="/mini-dark.min.css">
-</head>
-<body>
-	<pre>{}</pre>
-</body>
-</html>"#,
-		escape(&filename_s),
-		escape(&content_s),
-	);
-
-	Html(page)
+	//TODO Use template engine or load via js instead of this dirty hack
+	let page = format!(include!("retrieve_paste.tmpl"), escape(&filename_s), escape(&content_s));
+	Some(Html(page))
 }

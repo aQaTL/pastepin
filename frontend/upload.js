@@ -1,5 +1,6 @@
 "use strict";
 
+//TODO migrate to fetch API
 function send() {
     let form = document.pasteForm;
     let req = new XMLHttpRequest();

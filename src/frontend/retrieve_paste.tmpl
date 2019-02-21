@@ -1,0 +1,21 @@
+r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{}</title>
+	<link rel="stylesheet" href="/mini-dark.min.css">
+	<link rel="stylesheet" href="/snackbar.css">
+	<script src="/clipboard.js"></script>
+</head>
+<body>
+	<header>
+		<a href="index.html" class="logo">pastepin</a>
+		<a href="browse.html" class="button">browse</a>
+		<button onclick="copyToClipboard('content')">Copy to clipboard</button>
+	</header>
+	<br>
+	<pre id="content">{}</pre>
+	<div id="snackbar">Some text some message..</div>
+</body>
+</html>
+"#
