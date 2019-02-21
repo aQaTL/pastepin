@@ -5,6 +5,7 @@ use diesel::{
 	insertable::Insertable,
 	query_builder::UndecoratedInsertRecord,
 	prelude::*,
+	dsl::Eq,
 };
 use serde::{Serialize, Deserialize};
 use chrono::NaiveDateTime;
@@ -39,9 +40,9 @@ impl Queryable<(BigInt, Nullable<Text>, Timestamp), Pg> for Paste {
 }
 
 impl<'a> Insertable<pastes::table> for Paste {
-	type Values = <(Option<diesel::dsl::Eq<pastes::filename, String>>,
-					Option<diesel::dsl::Eq<pastes::content, String>>,
-					Option<diesel::dsl::Eq<pastes::creation_date, NaiveDateTime>>)
+	type Values = <(Option<Eq<pastes::filename, String>>,
+					Option<Eq<pastes::content, String>>,
+					Option<Eq<pastes::creation_date, NaiveDateTime>>)
 	as Insertable<pastes::table>>::Values;
 
 	fn values(self) -> Self::Values {
@@ -52,9 +53,9 @@ impl<'a> Insertable<pastes::table> for Paste {
 }
 
 impl<'a> Insertable<pastes::table> for &'a Paste {
-	type Values = <(Option<diesel::dsl::Eq<pastes::filename, &'a String>>,
-					Option<diesel::dsl::Eq<pastes::content, &'a String>>,
-					Option<diesel::dsl::Eq<pastes::creation_date, &'a NaiveDateTime>>)
+	type Values = <(Option<Eq<pastes::filename, &'a String>>,
+					Option<Eq<pastes::content, &'a String>>,
+					Option<Eq<pastes::creation_date, &'a NaiveDateTime>>)
 	as Insertable<pastes::table>>::Values;
 
 	fn values(self) -> Self::Values {

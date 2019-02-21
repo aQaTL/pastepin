@@ -48,8 +48,8 @@ pub fn get_paste(db: Db, paste_id: i64) -> Html<String> {
 		.first::<Paste>(&*db)
 		.unwrap();
 
-	let filename_s = paste.filename.unwrap_or(String::from("pastepin"));
-	let content_s = paste.content.unwrap_or(String::new());
+	let filename_s = paste.filename.unwrap_or_else(|| String::from("pastepin"));
+	let content_s = paste.content.unwrap_or_default();
 
 	let page = format!(
 		r#"<!DOCTYPE html>

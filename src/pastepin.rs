@@ -27,11 +27,11 @@ pub fn get_paste(db: Db, paste_id: i64) -> Json<Paste> {
 }
 
 #[get("/a?<count>")]
-pub fn all_pastes_brief(db: Db, count: Option<u8>) -> Json<Vec<Paste>> {
+pub fn all_pastes_brief(db: Db, count: Option<u32>) -> Json<Vec<Paste>> {
 	use crate::schema::pastes::dsl::*;
 	Json(pastes
 		.select((id, filename, creation_date))
-		.limit(count.unwrap_or(50) as i64)
+		.limit(i64::from(count.unwrap_or(50)))
 		.load::<Paste>(&*db)
 		.expect("Error loading pastes"))
 }
@@ -64,8 +64,6 @@ fn upload(db: Db, form: &PasteForm) -> status::Custom<Option<JsonValue>> {
 }
 
 fn now() -> NaiveDateTime {
-	match SystemTime::now().duration_since(UNIX_EPOCH) {
-		Ok(n) => NaiveDateTime::from_timestamp(n.as_secs() as i64, 0),
-		Err(_) => panic!("Time went backwards"),
-	}
+	let since_unix = SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards");
+	NaiveDateTime::from_timestamp(since_unix.as_secs() as i64, 0)
 }
