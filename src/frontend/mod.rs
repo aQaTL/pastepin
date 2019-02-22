@@ -22,7 +22,7 @@ lazy_static::lazy_static! {
 
 pub fn routes() -> Vec<Route> {
 	let mut r = rocket::routes![index, get_paste];
-	r.push(serve_frontend());
+	r.push(Route::ranked(1, Get, "/<resource..>", FrontendHandler()));
 	r
 }
 
@@ -33,10 +33,6 @@ fn index() -> content::Html<&'static str> {
 
 #[derive(Clone, Copy)]
 pub struct FrontendHandler();
-
-fn serve_frontend() -> Route {
-	Route::ranked(1, Get, "/<resource..>", FrontendHandler())
-}
 
 impl Handler for FrontendHandler {
 	fn handle(&self, req: &Request, data: Data) -> Outcome<'static> {
@@ -56,7 +52,6 @@ impl Handler for FrontendHandler {
 		Outcome::from(req, content::Content(http::ContentType::Plain, *file))
 	}
 }
-
 
 #[get("/<paste_id>", rank = 2)]
 pub fn get_paste(db: Db, paste_id: i64) -> Option<Html<String>> {
