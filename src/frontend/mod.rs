@@ -1,13 +1,14 @@
 use rocket::{
+	*,
 	Route,
 	get,
-	http,
+	http::Method::Get,
 	response::content::Html,
 	response::content,
+	handler::Outcome,
 };
 use diesel::prelude::*;
 use std::collections::HashMap;
-use std::path::PathBuf;
 use v_htmlescape::escape;
 
 use crate::Db;
@@ -20,7 +21,9 @@ lazy_static::lazy_static! {
 }
 
 pub fn routes() -> Vec<Route> {
-	rocket::routes![index, serve_frontend, get_paste]
+	let mut r = rocket::routes![index, get_paste];
+	r.push(serve_frontend());
+	r
 }
 
 #[get("/")]
@@ -28,18 +31,34 @@ fn index() -> content::Html<&'static str> {
 	content::Html(FRONTEND_FILES.get("index.html").unwrap())
 }
 
-#[get("/<resource..>", rank = 2)]
-fn serve_frontend(resource: PathBuf) -> Option<content::Content<&'static str>> {
-	let file = FRONTEND_FILES.get(resource.to_str().unwrap())?;
-	if let Some(ext) = resource.extension() {
-		if let Some(content_type) = http::ContentType::parse_flexible(ext.to_str().unwrap()) {
-			return Some(content::Content(content_type, file));
-		}
-	}
-	Some(content::Content(http::ContentType::Plain, file))
+#[derive(Clone, Copy)]
+pub struct FrontendHandler();
+
+fn serve_frontend() -> Route {
+	Route::ranked(1, Get, "/<resource..>", FrontendHandler())
 }
 
-#[get("/<paste_id>", rank = 1)]
+impl Handler for FrontendHandler {
+	fn handle(&self, req: &Request, data: Data) -> Outcome<'static> {
+		let resource = match req.uri().segments().into_path_buf(false) {
+			Ok(path) => path,
+			Err(_) => return Outcome::forward(data),
+		};
+		let file = match FRONTEND_FILES.get(resource.to_str().unwrap()) {
+			Some(file) => file,
+			None => return Outcome::forward(data),
+		};
+		if let Some(ext) = resource.extension() {
+			if let Some(content_type) = http::ContentType::parse_flexible(ext.to_str().unwrap()) {
+				return Outcome::from(req, content::Content(content_type, *file));
+			}
+		}
+		Outcome::from(req, content::Content(http::ContentType::Plain, *file))
+	}
+}
+
+
+#[get("/<paste_id>", rank = 2)]
 pub fn get_paste(db: Db, paste_id: i64) -> Option<Html<String>> {
 	use crate::schema::pastes::dsl::*;
 
