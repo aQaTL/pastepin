@@ -2,3 +2,4 @@
 **/*.rs.bk
 Rocket.toml
 .env
+src/frontend/frontend_files.array

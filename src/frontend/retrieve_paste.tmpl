@@ -14,8 +14,14 @@ r#"<!DOCTYPE html>
 		<button onclick="copyToClipboard('content')">Copy to clipboard</button>
 	</header>
 	<br>
-	<pre id="content">{}</pre>
-	<div id="snackbar">Some text some message..</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm col-md col-lg-8 col-lg-offset-2">
+				<pre id="content">{}</pre>
+				<div id="snackbar">Some text some message..</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
 "#

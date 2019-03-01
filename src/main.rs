@@ -17,17 +17,24 @@ fn clap_app() -> clap::App<'static, 'static> {
 		.about(crate_description!())
 		.version(crate_version!())
 		.author(crate_authors!())
+		.arg(Arg::with_name("no-frontend")
+			.short("f")
+			.long("no-frontend")
+			.takes_value(false)
+			.help("Run without built in frontend"))
 }
 
 #[database("pastepin_db")]
 pub struct Db(diesel::PgConnection);
 
 fn main() {
-	let _app = clap_app().get_matches();
+	let app = clap_app().get_matches();
 
-	rocket::ignite()
-		.mount("/", pastepin::routes())
-		.mount("/", frontend::routes())
+	let mut r = rocket::ignite();
+	if !app.is_present("no-frontend") {
+		r = r.mount("/", frontend::routes())
+	}
+	r.mount("/", pastepin::routes())
 		.attach(Db::fairing())
 		.launch();
 }
