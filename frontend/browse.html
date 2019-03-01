@@ -10,6 +10,29 @@
 	<!--TODO switch to prod version-->
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="browse.js"></script>
+
+	<style>
+		:root {
+			--a-link-color: #FF954F;
+			--a-visited-color: #A85400;
+			--pre-color: #FFA000;
+		}
+
+		.filename-link {
+			font-weight: bold;
+		}
+
+		.filename-link:hover {
+			color: #FF7400;
+			text-decoration: none;
+		}
+
+		.paste-row:hover {
+			background-color: #333333;
+			border: 1px solid transparent;
+			border-radius: 16px;
+		}
+	</style>
 </head>
 <body>
 	<header>
@@ -18,13 +41,15 @@
 	</header>
 	<div class="container">
 		<div id="app">
-			<div v-for="paste in pastes">
-				<div class="row">
-					<div class="col-sm col-md col-lg-8 col-lg-offset-2">
-						<h4><a class="title" :href="paste.id">{{ paste.filename | parseFilename }}</a></h4>
-						<span>Uploaded {{ paste.creation_date }}</span>
-						<pre>{{ paste.content }}</pre>
+			<div v-for="paste in pastes" class="row">
+				<div class="col-sm col-md col-lg-8 col-lg-offset-2 paste-row">
+					<div>
+						<h4>
+							<a class="filename-link" :href="paste.id">{{ paste.filename | parseFilename }}</a>
+							<small>Uploaded {{ paste.creation_date }}</small>
+						</h4>
 					</div>
+					<pre>{{ paste.content }}</pre>
 				</div>
 			</div>
 		</div>
