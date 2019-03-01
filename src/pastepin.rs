@@ -3,7 +3,7 @@ use rocket::{
 	get, post,
 	request::Form,
 	response::status,
-	http::{Status},
+	http::Status,
 };
 use rocket_contrib::{json::{Json, JsonValue}, json};
 use crate::Db;
@@ -54,7 +54,8 @@ fn upload(db: Db, form: &PasteForm) -> status::Custom<Option<JsonValue>> {
 	};
 
 	match diesel::insert_into(pastes).values(paste).get_result::<Paste>(&*db) {
-		Ok(paste) => status::Custom(Status::Created, Some(json!({"id": paste.id}))),
+		Ok(paste) => status::Custom(Status::Created, Some(json!(
+			{"id": paste.id, "creation_date": paste.creation_date}))),
 		Err(err) => {
 			eprintln!("Error: {:?}", err);
 			status::Custom(Status::InternalServerError, None)

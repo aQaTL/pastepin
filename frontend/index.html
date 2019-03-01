@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<title>pastepin</title>
@@ -8,8 +8,12 @@
 	<link rel="stylesheet" href="mini-dark.min.css">
 	<link rel="stylesheet" href="snackbar.css">
 
-	<script src="upload.js"></script>
 	<script src="clipboard.js"></script>
+
+	<!--TODO switch to prod version-->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="upload.js"></script>
+
 	<style>
 		#content {
 			font-family: monospace;
@@ -21,8 +25,25 @@
 		}
 
 		.main-content {
-			max-width: 1100px !important;
-			margin: auto;
+			max-width: 1200px !important;
+		}
+
+		.card a {
+			--a-link-color: #FF954F;
+			--a-visited-color: #A85400;
+		}
+
+		.card a:hover {
+			color: #FF7400;
+			text-decoration: none;
+		}
+
+		.card h4 {
+			margin-bottom: 0;
+		}
+
+		.card p {
+			margin-top: 0;
 		}
 	</style>
 </head>
@@ -31,27 +52,34 @@
 		<a href="index.html" class="logo">pastepin</a>
 		<a href="browse.html" class="button">browse</a>
 	</header>
-	<div class="container">
+	<div id="app" class="container">
 		<div class="row">
-			<div class="col-sm col-md col-lg">
-				<div class="main-content">
-					<form name="pasteForm" id="pasteFrom" action="javascript:send()">
+			<div
+					class="col-sm-12 col-md-12 col-lg-8 col-lg-offset-2 col-sm-last col-md-last main-content">
+				<div class="">
+					<form name="pasteForm" id="pasteFrom" action="javascript:void(0)"
+								v-on:submit.prevent="send">
 						<fieldset>
 							<legend>New paste</legend>
 
 							<label for="filename">Filename:</label>
 							<input type="text" id="filename" name="filename"
-								   placeholder="File name">
+										 placeholder="File name">
 							<br><label for="content">Paste data: </label><br>
 							<textarea name="content" id="content"
-									  placeholder="Paste content here..." required></textarea>
+												placeholder="Paste content here..." required></textarea>
 							<br>
 							<input type="submit" value="Submit" class="tertiary">
 							<input type="button" onclick="pasteFromClipboard('content')"
-								   value="Paste from clipboard">
+										 value="Paste from clipboard">
 						</fieldset>
 					</form>
-					<div id="result"></div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-sm-first col-md-12 col-lg-last col-lg-2">
+				<div class="row">
+					<uploaded-paste v-for="paste in uploadedPastes" v-bind:paste="paste"
+													v-bind:key="paste.id"></uploaded-paste>
 				</div>
 			</div>
 		</div>
