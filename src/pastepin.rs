@@ -14,6 +14,7 @@ use crate::models::*;
 use crate::schema::pastes::dsl::pastes;
 use chrono::NaiveDateTime;
 use crate::pagination::Paginate;
+use diesel::expression::sql_literal::sql;
 
 pub fn routes() -> Vec<Route> {
 	rocket::routes![get_paste, upload_generic, upload_json, all_pastes_brief]
@@ -34,7 +35,8 @@ pub fn all_pastes_brief(db: Db, page: Option<i64>) -> Json<PaginatedPastes> {
 	use crate::schema::pastes::dsl::*;
 	let page = page.unwrap_or(1);
 	let (loaded_pastes, total_pages) = pastes
-		.select(crate::schema::pastes::all_columns)
+		.select(
+			(id, filename, sql(&format!("SUBSTRING({} from 1 for 150)", content::NAME)), creation_date))
 		.order(id.asc())
 		.paginate(page, DEFAULT_PER_PAGE)
 		.load_and_count_pages::<Paste>(&*db)

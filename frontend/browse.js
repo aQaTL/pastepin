@@ -29,6 +29,7 @@ window.onload = () => {
 						paginatedPastes.pastes
 							.forEach(paste => {
 								paste.filename = parseFilename(paste.filename);
+								paste.content = paste.content.split("\n", 4).join("\n");
 								this.pastes.push(paste);
 							});
 						$state.loaded();

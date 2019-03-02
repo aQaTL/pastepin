@@ -33,6 +33,17 @@
 			border: 1px solid transparent;
 			border-radius: 16px;
 		}
+
+		h4 {
+			margin-top: 0;
+		}
+
+		pre {
+			max-height: 100px;
+			overflow-x: hidden;
+			overflow-y: hidden;
+			white-space: pre-line;
+		}
 	</style>
 </head>
 <body>
@@ -41,12 +52,17 @@
 		<a href="browse.html" class="button">browse</a>
 	</header>
 	<div class="container">
+		<div class="row">
+			<div class="col-sm col-md col-lg" style="text-align: center">
+				<h5>Contents are showing the first 150 characters or the first 4 lines</h5>
+			</div>
+		</div>
 		<div id="app">
 			<div v-for="paste in pastes" class="row">
 				<div class="col-sm col-md col-lg-8 col-lg-offset-2 paste-row">
 					<div>
 						<h4>
-							<a class="filename-link" :href="paste.id">{{ paste.filename }}</a>
+							<a class="filename-link" :href="paste.id" target="_blank">{{ paste.filename }}</a>
 							<small>ID: {{ paste.id }} | Uploaded {{ paste.creation_date }}</small>
 						</h4>
 					</div>
