@@ -13,6 +13,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::models::*;
 use crate::schema::pastes::dsl::pastes;
 use chrono::NaiveDateTime;
+use crate::pagination::Paginate;
 
 pub fn routes() -> Vec<Route> {
 	rocket::routes![get_paste, upload_generic, upload_json, all_pastes_brief]
@@ -26,13 +27,18 @@ pub fn get_paste(db: Db, paste_id: i64) -> Json<Paste> {
 		.unwrap())
 }
 
-#[get("/a?<count>")]
-pub fn all_pastes_brief(db: Db, count: Option<u32>) -> Json<Vec<Paste>> {
+const DEFAULT_PER_PAGE: i64 = 50;
+
+#[get("/a?<page>")]
+pub fn all_pastes_brief(db: Db, page: Option<i64>) -> Json<PaginatedPastes> {
 	use crate::schema::pastes::dsl::*;
-	Json(pastes
-		.limit(i64::from(count.unwrap_or(50)))
-		.load::<Paste>(&*db)
-		.expect("Error loading pastes"))
+	let page = page.unwrap_or(1);
+	let (loaded_pastes, total_pages) = pastes
+		.select(crate::schema::pastes::all_columns)
+		.paginate(page, DEFAULT_PER_PAGE)
+		.load_and_count_pages::<Paste>(&*db)
+		.expect("Unable to load pastes");
+	Json(PaginatedPastes { page, total_pages, pastes: loaded_pastes })
 }
 
 #[post("/u", rank = 2, data = "<form>")]

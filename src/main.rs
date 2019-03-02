@@ -8,6 +8,7 @@ mod schema;
 mod models;
 mod pastepin;
 mod frontend;
+mod pagination;
 
 use rocket_contrib::databases::database;
 

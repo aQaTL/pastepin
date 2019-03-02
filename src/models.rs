@@ -72,3 +72,10 @@ pub struct PasteForm {
 	pub filename: Option<String>,
 	pub content: Option<String>,
 }
+
+#[derive(Serialize)]
+pub struct PaginatedPastes {
+	pub page: i64,
+	pub total_pages: i64,
+	pub pastes: Vec<Paste>,
+}
