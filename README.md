@@ -15,6 +15,8 @@ The only thing you really will be needing to set is a database url. You can do t
 environment variable or a `Rocket.toml` file. You can read more about configuration options on the 
 [rocket framework website](https://rocket.rs/v0.4/guide/configuration/#configuration).
 
+For now only PostgreSQL database is supported.
+
 ### Rocket.toml
 
 Minimal `Rocket.toml`. Needs to be placed in the same directory as the binary or it's parent 
