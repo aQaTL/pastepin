@@ -35,6 +35,7 @@ pub fn all_pastes_brief(db: Db, page: Option<i64>) -> Json<PaginatedPastes> {
 	let page = page.unwrap_or(1);
 	let (loaded_pastes, total_pages) = pastes
 		.select(crate::schema::pastes::all_columns)
+		.order(id.asc())
 		.paginate(page, DEFAULT_PER_PAGE)
 		.load_and_count_pages::<Paste>(&*db)
 		.expect("Unable to load pastes");
