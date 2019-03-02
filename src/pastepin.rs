@@ -6,6 +6,7 @@ use rocket::{
 	http::Status,
 };
 use rocket_contrib::{json::{Json, JsonValue}, json};
+use rocket_cors::{Guard, Responder};
 use crate::Db;
 use diesel::prelude::*;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -21,17 +22,17 @@ pub fn routes() -> Vec<Route> {
 }
 
 #[get("/p/<paste_id>")]
-pub fn get_paste(db: Db, paste_id: i64) -> Json<Paste> {
-	Json(pastes
+pub fn get_paste(db: Db, cors: Guard, paste_id: i64) -> Responder<Json<Paste>> {
+	cors.responder(Json(pastes
 		.find(paste_id)
 		.first::<Paste>(&*db)
-		.unwrap())
+		.unwrap()))
 }
 
 const DEFAULT_PER_PAGE: i64 = 50;
 
 #[get("/a?<page>")]
-pub fn all_pastes_brief(db: Db, page: Option<i64>) -> Json<PaginatedPastes> {
+pub fn all_pastes_brief(db: Db, cors: Guard, page: Option<i64>) -> Responder<Json<PaginatedPastes>> {
 	use crate::schema::pastes::dsl::*;
 	let page = page.unwrap_or(1);
 	let (loaded_pastes, total_pages) = pastes
@@ -41,17 +42,17 @@ pub fn all_pastes_brief(db: Db, page: Option<i64>) -> Json<PaginatedPastes> {
 		.paginate(page, DEFAULT_PER_PAGE)
 		.load_and_count_pages::<Paste>(&*db)
 		.expect("Unable to load pastes");
-	Json(PaginatedPastes { page, total_pages, pastes: loaded_pastes })
+	cors.responder(Json(PaginatedPastes { page, total_pages, pastes: loaded_pastes }))
 }
 
 #[post("/u", rank = 2, data = "<form>")]
-pub fn upload_generic(db: Db, form: Form<PasteForm>) -> status::Custom<Option<JsonValue>> {
-	upload(db, &form)
+pub fn upload_generic(db: Db, cors: Guard, form: Form<PasteForm>) -> Responder<status::Custom<Option<JsonValue>>> {
+	cors.responder(upload(db, &form))
 }
 
 #[post("/u", rank = 1, data = "<form>", format = "application/json")]
-pub fn upload_json(db: Db, form: Json<PasteForm>) -> status::Custom<Option<JsonValue>> {
-	upload(db, &form)
+pub fn upload_json(db: Db, cors: Guard, form: Json<PasteForm>) -> Responder<status::Custom<Option<JsonValue>>> {
+	cors.responder(upload(db, &form))
 }
 
 fn upload(db: Db, form: &PasteForm) -> status::Custom<Option<JsonValue>> {
