@@ -2,6 +2,8 @@
 
 Simple pastebin
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 ## Compilation
 
 You'll need [Rust](https://www.rust-lang.org/) and cargo installed (just use rustup).
