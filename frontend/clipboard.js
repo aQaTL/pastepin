@@ -10,7 +10,7 @@ function showSnackbar(msg) {
 const snackbarFn = (msg) => () => showSnackbar(msg);
 
 function copyToClipboard(elementId) {
-    if (navigator.clipboard.writeText === undefined)
+    if (navigator.clipboard === undefined || navigator.clipboard.writeText === undefined)
         showSnackbar("Clipboard not available");
     else
         navigator.clipboard.writeText(document.getElementById(elementId).innerText)
@@ -18,7 +18,7 @@ function copyToClipboard(elementId) {
 }
 
 function pasteFromClipboard(elementId) {
-    if (navigator.clipboard.readText === undefined)
+    if (navigator.clipboard === undefined || navigator.clipboard.readText === undefined)
         showSnackbar("Clipboard not available");
     else
         navigator.clipboard.readText().then(
