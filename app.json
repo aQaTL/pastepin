@@ -1,0 +1,14 @@
+{
+	"name": "pastepin",
+	"keywords": ["pastebin"],
+	"addons": [
+		{
+			"plan": "heroku-postgresql"
+		}
+	],
+	"buildpacks": [
+		{
+			"url": "https://github.com/emk/heroku-buildpack-rust"
+		}
+	]
+}
