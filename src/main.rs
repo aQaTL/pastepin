@@ -40,6 +40,16 @@ fn main() {
 		..Default::default()
 	};
 
+	//For heroku deploy
+	if let Ok(port) = std::env::var("PORT") {
+		if port.parse::<u16>().is_ok() {
+			std::env::set_var("ROCKET_PORT", port);
+		}
+	}
+	if let Ok(db_url) = std::env::var("DATABASE_URL") {
+		std::env::set_var("ROCKET_DATABASES", format!("{{pastepin_db={{url=\"{}\"}}}}", db_url));
+	}
+
 	let mut r = rocket::ignite();
 	if !app.is_present("no-frontend") {
 		r = r.mount("/", frontend::routes())
