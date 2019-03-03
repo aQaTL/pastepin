@@ -9,10 +9,3 @@ CREATE TABLE pastes
   WITH (
     OIDS = FALSE
   );
-
-
-ALTER TABLE pastes
-  OWNER TO pastepin_user;
-
-GRANT ALL ON TABLE pastes TO postgres;
-GRANT ALL ON TABLE pastes TO pastepin_user;
