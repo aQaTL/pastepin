@@ -14,6 +14,10 @@ Vue.component("uploaded-paste", {
 			filename === "" || filename === null || filename === undefined ? "unnamed" : filename,
 	},
 
+	mounted: function() {
+		this.$el.scrollIntoView();
+	},
+
 	template: `<div class="card fluid">
 			<h4><a :href="paste.id" target="_blank">{{ paste.filename | parseFilename }}</a>
 			<small>Uploaded: {{ paste.creation_date.toLocaleString(lang) }}</small>
