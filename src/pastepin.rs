@@ -38,7 +38,7 @@ pub fn all_pastes_brief(db: Db, cors: Guard, page: Option<i64>) -> Responder<Jso
 	let (loaded_pastes, total_pages) = pastes
 		.select(
 			(id, filename, sql(&format!("SUBSTRING({} from 1 for 150)", content::NAME)), creation_date))
-		.order(id.asc())
+		.order(id.desc())
 		.paginate(page, DEFAULT_PER_PAGE)
 		.load_and_count_pages::<Paste>(&*db)
 		.expect("Unable to load pastes");
