@@ -73,7 +73,7 @@ pub fn upload<'a>(db: Db, cors: Guard<'a>, cont_type: &ContentType, data: Data)
 				json!({"err": err.to_string()}))),
 		}
 	}
-	cors.responder(status::Custom(Status::Created, json!({"ids": ids})))
+	cors.responder(status::Custom(Status::Created, json!(ids)))
 }
 
 fn process_entry_upload<R: Read>(mut entry: MultipartField<&mut Multipart<R>>)
