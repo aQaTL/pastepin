@@ -1,3 +1,5 @@
+use crate::schema::{pastes, images};
+
 use diesel::{
 	Queryable,
 	sql_types::*,
@@ -10,10 +12,10 @@ use diesel::{
 use serde::{Serialize, Deserialize};
 use chrono::NaiveDateTime;
 use rocket_codegen::FromForm;
+use rocket::{Request, response::{self, Responder}, Response, http::{self, ContentType}};
+use std::io::Cursor;
 
-use crate::schema::pastes;
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct Paste {
 	pub id: i64,
 	pub filename: Option<String>,
@@ -67,15 +69,52 @@ impl<'a> Insertable<pastes::table> for &'a Paste {
 
 impl<'a> UndecoratedInsertRecord<pastes::table> for Paste {}
 
-#[derive(FromForm, Serialize, Deserialize, Debug)]
+#[derive(FromForm, Deserialize, Debug)]
 pub struct PasteForm {
 	pub filename: Option<String>,
 	pub content: Option<String>,
 }
 
-#[derive(Serialize)]
-pub struct PaginatedPastes {
-	pub page: i64,
-	pub total_pages: i64,
-	pub pastes: Vec<Paste>,
+#[derive(Serialize, Debug)]
+pub struct Image {
+	pub id: i64,
+	pub filename: String,
+	pub creation_date: NaiveDateTime,
+	pub content: Vec<u8>,
+}
+
+impl Queryable<images::SqlType, Pg> for Image {
+	type Row = (i64, String, NaiveDateTime, Vec<u8>);
+
+	fn build(row: Self::Row) -> Self {
+		let (id, filename, creation_date, content) = row;
+		Image { id, filename, creation_date, content }
+	}
+}
+
+impl Queryable<(BigInt, Text, Timestamp), Pg> for Image {
+	type Row = (i64, String, NaiveDateTime);
+
+	fn build(row: Self::Row) -> Self {
+		let (id, filename, creation_date) = row;
+		Image { id, filename, creation_date, content: vec![] }
+	}
+}
+
+impl<'r> Responder<'r> for Image {
+	fn respond_to(self, _: &Request) -> response::Result<'r> {
+		Response::build()
+			.header(ContentType::from_extension(&self.filename)
+				.map_or(http::Header::new("Content-Type", "image"), Into::into))
+			.sized_body(Cursor::new(self.content))
+			.ok()
+	}
+}
+
+#[derive(Insertable, Debug)]
+#[table_name = "images"]
+pub struct NewImage {
+	pub filename: String,
+	pub creation_date: NaiveDateTime,
+	pub content: Vec<u8>,
 }

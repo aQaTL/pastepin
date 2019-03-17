@@ -4,9 +4,11 @@
 #[macro_use]
 extern crate diesel; //Needed for ORM macros
 
+mod utils;
 mod schema;
 mod models;
 mod pastepin;
+mod imagepin;
 mod frontend;
 mod pagination;
 
@@ -55,6 +57,7 @@ fn main() {
 		r = r.mount("/", frontend::routes())
 	}
 	r.mount("/", pastepin::routes())
+		.mount("/", imagepin::routes())
 		.mount("/", catch_all_options_routes())
 		.attach(Db::fairing())
 		.manage(options)

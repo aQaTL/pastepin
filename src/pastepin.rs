@@ -1,3 +1,6 @@
+use crate::schema::pastes::dsl::pastes;
+use crate::{utils, Db, models::*, pagination::{Paginate, Paginated}};
+
 use rocket::{
 	Route,
 	get, post,
@@ -7,14 +10,7 @@ use rocket::{
 };
 use rocket_contrib::{json::{Json, JsonValue}, json};
 use rocket_cors::{Guard, Responder};
-use crate::Db;
 use diesel::prelude::*;
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use crate::models::*;
-use crate::schema::pastes::dsl::pastes;
-use chrono::NaiveDateTime;
-use crate::pagination::Paginate;
 use diesel::expression::sql_literal::sql;
 
 pub fn routes() -> Vec<Route> {
@@ -32,17 +28,15 @@ pub fn get_paste(db: Db, cors: Guard, paste_id: i64) -> Responder<Json<Paste>> {
 const DEFAULT_PER_PAGE: i64 = 50;
 
 #[get("/a?<page>")]
-pub fn all_pastes_brief(db: Db, cors: Guard, page: Option<i64>) -> Responder<Json<PaginatedPastes>> {
+pub fn all_pastes_brief(db: Db, cors: Guard, page: Option<i64>) -> Responder<Json<Paginated<Paste>>> {
 	use crate::schema::pastes::dsl::*;
-	let page = page.unwrap_or(1);
-	let (loaded_pastes, total_pages) = pastes
+	cors.responder(Json(pastes
 		.select(
 			(id, filename, sql(&format!("SUBSTRING({} from 1 for 150)", content::NAME)), creation_date))
 		.order(id.desc())
-		.paginate(page, DEFAULT_PER_PAGE)
+		.paginate(page.unwrap_or(1), DEFAULT_PER_PAGE)
 		.load_and_count_pages::<Paste>(&*db)
-		.expect("Unable to load pastes");
-	cors.responder(Json(PaginatedPastes { page, total_pages, pastes: loaded_pastes }))
+		.expect("Unable to load pastes")))
 }
 
 #[post("/u", rank = 2, data = "<form>")]
@@ -60,7 +54,7 @@ fn upload(db: Db, form: &PasteForm) -> status::Custom<Option<JsonValue>> {
 		id: 0, //gets ignored when inserting (custom Insertable impl)
 		filename: form.filename.clone(),
 		content: form.content.clone(),
-		creation_date: now(),
+		creation_date: utils::now(),
 	};
 
 	match diesel::insert_into(pastes).values(paste).get_result::<Paste>(&*db) {
@@ -71,9 +65,4 @@ fn upload(db: Db, form: &PasteForm) -> status::Custom<Option<JsonValue>> {
 			status::Custom(Status::InternalServerError, None)
 		}
 	}
-}
-
-fn now() -> NaiveDateTime {
-	let since_unix = SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards");
-	NaiveDateTime::from_timestamp(since_unix.as_secs() as i64, 0)
 }
