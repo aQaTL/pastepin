@@ -26,7 +26,7 @@ window.onload = () => {
 						let paginatedPastes = JSON.parse(req.responseText);
 						this.page = paginatedPastes.page;
 						this.total_pages = paginatedPastes.total_pages;
-						paginatedPastes.pastes
+						paginatedPastes.results
 							.forEach(paste => {
 								paste.filename = parseFilename(paste.filename);
 								paste.content = paste.content.split("\n", 4).join("\n");

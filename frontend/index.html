@@ -10,7 +10,8 @@
 
 	<script src="clipboard.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+	<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>-->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="upload.js"></script>
 
 	<style>
@@ -55,30 +56,34 @@
 		<div class="row">
 			<div
 					class="col-sm-12 col-md-12 col-lg-8 col-lg-offset-2 col-sm-last col-md-last main-content">
-				<div class="">
-					<form name="pasteForm" id="pasteFrom" action="javascript:void(0)"
-								v-on:submit.prevent="send">
-						<fieldset>
-							<legend>New paste</legend>
+				<form name="pasteForm" id="pasteFrom" action="javascript:void(0)"
+							v-on:submit.prevent="send">
+					<fieldset>
+						<legend>New paste</legend>
 
-							<label for="filename">Filename:</label>
-							<input type="text" id="filename" name="filename"
-										 placeholder="File name">
-							<br><label for="content">Paste data: </label><br>
-							<textarea name="content" id="content"
-												placeholder="Paste content here..." required></textarea>
-							<br>
+						<label for="filename">Filename:</label>
+						<input type="text" id="filename" name="filename"
+									 placeholder="File name">
+						<br><label for="content">Paste data: </label><br>
+						<textarea name="content" id="content"
+											placeholder="Paste content here..." required></textarea>
+						<br>
+						<input type="submit" value="Submit" class="tertiary">
+						<input type="button" onclick="pasteFromClipboard('content')"
+									 value="Paste from clipboard">
+					</fieldset>
+				</form>
+						<form name="imageForm" id="imageForm" action="javascript:void(0)"
+									v-on:submit.prevent="sendImg">
+							<label for="image">Choose an image</label>
+							<input type="file" id="image" name="image" accept="image/*" multiple>
 							<input type="submit" value="Submit" class="tertiary">
-							<input type="button" onclick="pasteFromClipboard('content')"
-										 value="Paste from clipboard">
-						</fieldset>
-					</form>
-				</div>
+						</form>
 			</div>
 			<div class="col-sm-12 col-sm-first col-md-12 col-lg-last col-lg-2">
 				<div class="row">
-					<uploaded-paste v-for="paste in uploadedPastes" v-bind:paste="paste"
-													v-bind:key="paste.id"></uploaded-paste>
+					<uploaded v-for="paste in uploaded" v-bind:paste="paste"
+										v-bind:key="paste.internalId"></uploaded>
 				</div>
 			</div>
 		</div>
