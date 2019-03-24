@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Browse pastepins</title>
-
+	<title>Browse images</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="mini-dark.min.css">
 
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+	<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>-->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="https://unpkg.com/vue-infinite-loading@^2/dist/vue-infinite-loading.js"></script>
-	<script src="browse.js"></script>
+	<script src="browse_imgs.js"></script>
 
 	<style>
 		:root {
@@ -62,11 +62,15 @@
 				<div class="col-sm col-md col-lg-8 col-lg-offset-2 paste-row">
 					<div>
 						<h4>
-							<a class="filename-link" :href="paste.id" target="_blank">{{ paste.filename }}</a>
+							<a class="filename-link" :href="'/i/'+paste.id" target="_blank">
+								{{ paste.filename }}
+							</a>
 							<small>ID: {{ paste.id }} | Uploaded {{ paste.creation_date }}</small>
 						</h4>
 					</div>
-					<pre>{{ paste.content }}</pre>
+					<a :href="'/i/'+paste.id" target="_blank">
+						<img :src="'/i/'+paste.id"/>
+					</a>
 				</div>
 			</div>
 			<infinite-loading @infinite="infiniteHandler"></infinite-loading>
